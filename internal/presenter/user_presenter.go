@@ -89,12 +89,12 @@ func (u *UserPresenter) Patch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
 		return
 	}
-	var patch model.UserPatch
-	if err := c.ShouldBindJSON(&patch); err != nil {
+	var user model.User
+	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
-	updatedUser, err := u.usecase.Patch(c.Request.Context(), id, patch)
+	updatedUser, err := u.usecase.Patch(c.Request.Context(), id, user)
 	if errors.Is(err, repository.ErrUserNotFound) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return

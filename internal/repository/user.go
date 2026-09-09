@@ -19,7 +19,7 @@ type (
 		List(ctx context.Context) ([]model.User, error)
 		GetByID(ctx context.Context, id int) (model.User, error)
 		Create(ctx context.Context, u model.User) (model.User, error)
-		Update(ctx context.Context, u model.User) error
+		Patch(ctx context.Context, id int, u model.User) error
 		Delete(ctx context.Context, id int) error
 	}
 
@@ -95,18 +95,31 @@ func (r *UserRepository) Create(ctx context.Context, u model.User) (model.User, 
 	return u, nil
 }
 
-func (r *UserRepository) Update(ctx context.Context, u model.User) error {
+func (r *UserRepository) Patch(ctx context.Context, id int, u model.User) error {
 	tag, err := r.db.Exec(ctx,
-		`UPDATE users SET nik = $1, email = $2, name = $3, division = $4, password = $5 WHERE id = $6`,
-		u.NIK, u.Email, u.Name, u.Division, u.Password, u.ID)
+		`UPDATE users
+		 SET
+			nik = COALESCE(NULLIF($1, ''), nik),
+			email = COALESCE(NULLIF($2, ''), email),
+			name = COALESCE(NULLIF($3, ''), name),
+			division = COALESCE(NULLIF($4, ''), division),
+			password = COALESCE(NULLIF($5, ''), password)
+		 WHERE id = $6`,
+		u.NIK,
+		u.Email,
+		u.Name,
+		u.Division,
+		u.Password,
+		id,
+	)
 	if err != nil {
 		return err
 	}
+
 	if tag.RowsAffected() == 0 {
 		return ErrUserNotFound
 	}
 
-	tag.Update()
 	return nil
 }
 

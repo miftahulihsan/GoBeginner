@@ -17,13 +17,13 @@ var (
 	ErrAllFieldsRequired = errors.New("all fields are required")
 )
 
-func (u *User) IsValidationErr(err error) bool {
-	return errors.Is(err, ErrInvalidEmail) ||
-		errors.Is(err, ErrInvalidPassword) ||
-		errors.Is(err, ErrInvalidID) ||
-		errors.Is(err, ErrAllFieldsRequired) ||
-		errors.Is(err, ErrDuplicateUser)
-}
+// func (u *User) IsValidationErr(err error) bool {
+// 	return errors.Is(err, ErrInvalidEmail) ||
+// 		errors.Is(err, ErrInvalidPassword) ||
+// 		errors.Is(err, ErrInvalidID) ||
+// 		errors.Is(err, ErrAllFieldsRequired) ||
+// 		errors.Is(err, ErrDuplicateUser)
+// }
 
 type User struct {
 	ID       int    `json:"id"`  // e.g., 1
@@ -90,6 +90,22 @@ func (u *User) ValidateInput() error {
 
 	// Validate Password strength
 	if !isStrongPassword(u.Password) {
+		return ErrInvalidPassword
+	}
+
+	return nil
+}
+
+func (u *User) ValidatePatch() error {
+	if u.Email != "" && !IsValidEmail(u.Email) {
+		return ErrInvalidEmail
+	}
+
+	if u.NIK != "" && !uidPattern.MatchString(u.NIK) {
+		return ErrInvalidID
+	}
+
+	if u.Password != "" && !isStrongPassword(u.Password) {
 		return ErrInvalidPassword
 	}
 

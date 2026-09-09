@@ -76,9 +76,9 @@ func TestUserRepository_CRUD(t *testing.T) {
 	// 3. Update
 	found.Name = "John Smith"
 	found.Division = "Marketing"
-	err = repo.Update(ctx, found)
+	err = repo.Patch(ctx, found.ID, found)
 	if err != nil {
-		t.Fatalf("Update failed: %v", err)
+		t.Fatalf("Patch failed: %v", err)
 	}
 
 	updated, _ := repo.GetByID(ctx, found.ID)
