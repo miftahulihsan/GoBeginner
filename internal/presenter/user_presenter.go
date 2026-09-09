@@ -71,7 +71,7 @@ func (u *UserPresenter) Create(c *gin.Context) {
 		errors.Is(err, model.ErrInvalidEmail) ||
 		errors.Is(err, model.ErrInvalidID) ||
 		errors.Is(err, model.ErrInvalidPassword) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error() + " - Password: " + createdUser.Password})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
